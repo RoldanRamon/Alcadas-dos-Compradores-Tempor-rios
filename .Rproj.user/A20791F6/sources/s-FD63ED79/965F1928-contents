@@ -1,0 +1,43 @@
+#rm(list = ls())
+library(dplyr)
+library(purrr)
+
+PAPEIS<- readxl::read_excel(path = 'Planilha para associar os integrantes de al?adas.xlsx',sheet = 'PAPEIS')
+APC<- readxl::read_excel(path = 'Planilha para associar os integrantes de al?adas.xlsx',sheet = 'INTEGRANTES APC')
+UCE<- readxl::read_excel(path = 'Planilha para associar os integrantes de al?adas.xlsx',sheet = 'INTEGRANTES UCE')
+ABEC<- readxl::read_excel(path = 'Planilha para associar os integrantes de al?adas.xlsx',sheet = 'INTEGRANTES ABEC')
+FNSR<- readxl::read_excel(path = 'Planilha para associar os integrantes de al?adas.xlsx',sheet = 'INTEGRANTES FNSR')
+FCHAMP<- readxl::read_excel(path = 'Planilha para associar os integrantes de al?adas.xlsx',sheet = 'INTEGRANTES FCHAMP')
+
+aprovador_1 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 1 R$ 0,01 A R$ 3.000') %>%mutate(SEGEUNCIA = 1, USUARIO = Aprovador)}
+aprovador_2 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 2 R$ 3.000,01 A R$ 30.000,00') %>%mutate(SEGEUNCIA = 1, USUARIO = Aprovador)}
+aprovador_21 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 2 R$ 3.000,01 A R$ 30.000,00') %>%mutate(SEGEUNCIA = 2, USUARIO = Aprovador)}
+aprovador_3 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 3 R$ 30.000,01 A R$ 2.000.000,00') %>%mutate(SEGEUNCIA = 1, USUARIO = Aprovador)}
+aprovador_31 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 3 R$ 30.000,01 A R$ 2.000.000,00') %>%mutate(SEGEUNCIA = 2, USUARIO = Aprovador)}
+aprovador_32 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 3 R$ 30.000,01 A R$ 2.000.000,00') %>%mutate(SEGEUNCIA = 3, USUARIO = Aprovador)}
+aprovador_4 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 4 ACIMA DE R$ 2.000.000,01') %>%mutate(SEGEUNCIA = 1, USUARIO = Aprovador)}
+aprovador_41 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 4 ACIMA DE R$ 2.000.000,01') %>%mutate(SEGEUNCIA = 2, USUARIO = Aprovador)}
+aprovador_42 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 4 ACIMA DE R$ 2.000.000,01') %>%mutate(SEGEUNCIA = 3, USUARIO = Aprovador)}
+aprovador_43 <- function(Aprovador) {APC %>% filter(NOMEDOGRUPO == 'ORDEM DE COMPRA - DSC SUPRIMENTOS 4 ACIMA DE R$ 2.000.000,01') %>%mutate(SEGEUNCIA = 4, USUARIO = Aprovador)}
+
+teste_1<- PAPEIS %>% dplyr::filter(NIVEIS == 'APROVADOR 1')
+teste_2<- PAPEIS %>% dplyr::filter(NIVEIS == 'APROVADOR 2')
+teste_3<- PAPEIS %>% dplyr::filter(NIVEIS == 'APROVADOR 3')
+teste_4<- PAPEIS %>% dplyr::filter(NIVEIS == 'APROVADOR 4')
+
+apc_final<- bind_rows(map_dfr(.x = teste_1$NOME_DE_USUARIO, .f = aprovador_1),
+                      
+                      map_dfr(.x = teste_1$NOME_DE_USUARIO, .f = aprovador_2),
+                      map_dfr(.x = teste_2$NOME_DE_USUARIO, .f = aprovador_21),
+                      
+                      map_dfr(.x = teste_1$NOME_DE_USUARIO, .f = aprovador_3),
+                      map_dfr(.x = teste_2$NOME_DE_USUARIO, .f = aprovador_31),
+                      map_dfr(.x = teste_3$NOME_DE_USUARIO, .f = aprovador_32),
+                      
+                      map_dfr(.x = teste_1$NOME_DE_USUARIO, .f = aprovador_4),
+                      map_dfr(.x = teste_2$NOME_DE_USUARIO, .f = aprovador_41),
+                      map_dfr(.x = teste_3$NOME_DE_USUARIO, .f = aprovador_42),
+                      map_dfr(.x = teste_4$NOME_DE_USUARIO, .f = aprovador_43)) %>%
+  distinct()
+
+writexl::write_xlsx(x = list(apc_final, uce_final, abec_final, fnsr_final, fchamp_final),path = 'arquivo.xlsx')
