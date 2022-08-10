@@ -21,7 +21,6 @@ usuarios_2 <- usuarios %>% filter(grupo == "OC -SOS TELECOM – SUPRIMENTOS 2 R$
 usuarios_3 <- usuarios %>% filter(grupo == "OC -SOS TELECOM – SUPRIMENTOS 3 R$ 30.000,01 A R$ 2.000.000,00")
 usuarios_4 <- usuarios %>% filter(grupo == "OC -SOS TELECOM – SUPRIMENTOS 4 ACIMA DE R$ 2.000.000,01")
 
-
 #Tratamento da Base
 base <- bind_rows(filiais_1 %>% mutate(teste = map(.x = handle,.f = ~ bind_cols(usuarios_1))) %>% unnest(cols = teste),
                   filiais_2 %>% mutate(teste = map(.x = handle,.f = ~ bind_cols(usuarios_2))) %>% unnest(cols = teste),
